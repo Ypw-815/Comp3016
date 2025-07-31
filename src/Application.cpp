@@ -1334,6 +1334,20 @@ void Application::InitializeModels() {
                                   glm::vec3(scale), true);
                 }
             }
+        }
+        
+        // Load signature model
+        std::cout << "🎨 Loading signature model..." << std::endl;
+        try {
+            // Place signature model at the center of the game world
+            glm::vec3 signaturePos = glm::vec3(0.0f, 2.0f, 0.0f); // Slightly elevated
+            LoadGameModel("resources/models/signature.obj", "signature", signaturePos,
+                          glm::vec3(90.0f, 0.0f, 180.0f), // Rotate 90 degrees up, flip 180 degrees left-right
+                          glm::vec3(0.5f, 0.5f, 0.5f), // Appropriate scaling
+                          true); // Enable animation
+            std::cout << "✅ Signature model loaded successfully!" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "❌ Failed to load signature model: " << e.what() << std::endl;
         } 
         
         m_modelsLoaded = true;
@@ -1403,6 +1417,9 @@ void Application::UpdateModels() {
             } else if (modelObj.name.find("key") != std::string::npos || modelObj.name.find("collectible") != std::string::npos) {
                 
                 modelObj.rotation.y += m_deltaTime * 1.2f; 
+            } else if (modelObj.name.find("signature") != std::string::npos) {
+                // Add slow Y-axis rotation animation for signature model
+                modelObj.rotation.y += m_deltaTime * 0.5f; // Slow rotation
             }
         }
     }
@@ -1462,6 +1479,17 @@ void Application::RenderModels() {
             m_blinnPhongShader->SetFloat("material.shininess", 8.0f);
             
             
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
+            m_blinnPhongShader->SetInt("material.diffuse", 0);
+        } else if (modelObj.name.find("signature") != std::string::npos) {
+            // Set special material properties for signature model - golden effect
+            m_blinnPhongShader->SetVec3("material.ambient", 0.2f, 0.15f, 0.05f);
+            m_blinnPhongShader->SetVec3("material.diffuse", 0.8f, 0.6f, 0.2f);
+            m_blinnPhongShader->SetVec3("material.specular", 1.0f, 0.8f, 0.4f);
+            m_blinnPhongShader->SetFloat("material.shininess", 256.0f);
+            
+            // Use default texture
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
             m_blinnPhongShader->SetInt("material.diffuse", 0);
@@ -1896,6 +1924,22 @@ void Application::RenderShadowMap() {
                     treasureModel->model->Draw(*m_shadowMapShader);
                     renderedObjects++;
                 }
+            }
+        }
+        
+        // Render signature model to shadow map
+        for (const auto& gameModel : m_gameModels) {
+            if (gameModel.name.find("signature") != std::string::npos) {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, gameModel.position);
+                model = glm::rotate(model, gameModel.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+                model = glm::rotate(model, gameModel.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+                model = glm::rotate(model, gameModel.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+                model = glm::scale(model, gameModel.scale);
+                
+                m_shadowMapShader->SetMat4("model", model);
+                gameModel.model->Draw(*m_shadowMapShader);
+                renderedObjects++;
             }
         }
     }
