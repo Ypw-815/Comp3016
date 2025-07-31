@@ -79,7 +79,7 @@ A 3D treasure hunting game built with OpenGL 4.1, featuring advanced graphics te
 1. **Clone the repository**
 
    ```bash
-   git clone [[<repository-url>](https://github.com/Ypw-815/Comp3016.git)](https://github.com/Ypw-815/Comp3016.git)
+   git clone https://github.com/Ypw-815/Comp3016.git
    cd comp3016
    ```
 
