@@ -255,7 +255,7 @@ comp3016/
 
 ## 🔗 Links
 
-- **GitHub Repository**: [https://github.com/yourusername/comp3016](https://github.com/yourusername/comp3016)
+- **GitHub Repository**: [https://github.com/Ypw-815/Comp3016]
 - **YouTube Demo Video**: [https://youtu.be/your-video-id](https://youtu.be/your-video-id)
 
 
